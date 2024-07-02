@@ -37,20 +37,24 @@ type Resolution =
 /// ## Examples
 ///
 /// ```gleam`
+/// type Env {
+///   Env(hello: String, foo: Float, count: Int, is_on: Bool)
+/// }
+///
 /// let definitions = [
 ///   #("HELLO", glenv.String),
 ///   #("FOO", glenv.Float),
 ///   #("COUNT", glenv.Int),
 ///   #("IS_ON", glenv.Bool),
 /// ]
-
 /// let decoder =
 ///   decode.into({
 ///     use hello <- decode.parameter
 ///     use foo <- decode.parameter
 ///     use count <- decode.parameter
 ///     use is_on <- decode.parameter
-///     TestEnv(hello: hello, foo: foo, count: count, is_on: is_on)
+///
+///     Env(hello: hello, foo: foo, count: count, is_on: is_on)
 ///   })
 ///   |> decode.field("HELLO", decode.string)
 ///   |> decode.field("FOO", decode.float)
