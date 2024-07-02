@@ -36,7 +36,7 @@ type Resolution =
 /// 
 /// ## Examples
 ///
-/// ```gleam`
+/// ```gleam
 /// type Env {
 ///   Env(hello: String, foo: Float, count: Int, is_on: Bool)
 /// }
@@ -66,7 +66,7 @@ type Resolution =
 /// env.foo // 1.0
 /// env.count // 1
 /// env.is_on // True
-/// ````
+/// ```
 pub fn load(
   decoder: decode.Decoder(env),
   definitions: List(Definition),
