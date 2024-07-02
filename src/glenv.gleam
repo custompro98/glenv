@@ -15,15 +15,11 @@ pub type Type {
   String
 }
 
-pub type ResolvedType {
-  RBool(value: Bool)
-  RFloat(value: Float)
-  RInt(value: Int)
-  RString(value: String)
-}
-
 pub type Definition =
   #(String, Type)
+
+type ResolvedType =
+  dynamic.Dynamic
 
 pub type Resolution =
   #(String, ResolvedType)
@@ -45,7 +41,7 @@ pub fn load(
 
   case
     parsed_env
-    |> list_to_dict
+    |> dict.from_list
     |> dynamic.from
     |> decode.from(decoder, _)
   {
@@ -82,19 +78,19 @@ fn parse_bool(definition: Definition, value: String) -> Result(Resolution, Nil) 
   let resolution =
     ["true", "yes", "1"] |> list.contains(string.lowercase(value))
 
-  Ok(#(definition.0, RBool(resolution)))
+  Ok(#(definition.0, dynamic.from(resolution)))
 }
 
 fn parse_float(definition: Definition, value: String) -> Result(Resolution, Nil) {
   case float.parse(value) {
-    Ok(resolution) -> Ok(#(definition.0, RFloat(resolution)))
+    Ok(resolution) -> Ok(#(definition.0, dynamic.from(resolution)))
     Error(_) -> Error(Nil)
   }
 }
 
 fn parse_int(definition: Definition, value: String) -> Result(Resolution, Nil) {
   case int.parse(value) {
-    Ok(resolution) -> Ok(#(definition.0, RInt(resolution)))
+    Ok(resolution) -> Ok(#(definition.0, dynamic.from(resolution)))
     Error(_) -> Error(Nil)
   }
 }
@@ -103,18 +99,5 @@ fn parse_string(
   definition: Definition,
   value: String,
 ) -> Result(Resolution, Nil) {
-  Ok(#(definition.0, RString(value)))
-}
-
-fn list_to_dict(in: List(Resolution)) {
-  in
-  |> list.map(fn(tup) {
-    #(tup.0, case tup.1 {
-      RBool(value) -> dynamic.from(value)
-      RFloat(value) -> dynamic.from(value)
-      RInt(value) -> dynamic.from(value)
-      RString(value) -> dynamic.from(value)
-    })
-  })
-  |> dict.from_list
+  Ok(#(definition.0, dynamic.from(value)))
 }

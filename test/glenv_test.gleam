@@ -1,6 +1,7 @@
 import decode
 import envoy
 import gleam/bool
+import gleam/dynamic
 import gleam/float
 import gleam/int
 import gleam/string
@@ -25,47 +26,47 @@ const is_on_key = "IS_ON"
 pub fn parse_bool_test() {
   envoy.set(key, "yes")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "YES")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "yEs")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "true")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "TRUE")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "trUE")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "1")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(True))]))
+  |> should.equal(Ok([#(key, dynamic.from(True))]))
 
   envoy.set(key, "no")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(False))]))
+  |> should.equal(Ok([#(key, dynamic.from(False))]))
 
   envoy.set(key, "false")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(False))]))
+  |> should.equal(Ok([#(key, dynamic.from(False))]))
 
   envoy.set(key, "0")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(False))]))
+  |> should.equal(Ok([#(key, dynamic.from(False))]))
 
   envoy.set(key, "anythingelse")
   glenv.parse([#(key, glenv.Bool)])
-  |> should.equal(Ok([#(key, glenv.RBool(False))]))
+  |> should.equal(Ok([#(key, dynamic.from(False))]))
 
   envoy.unset(key)
 }
@@ -73,15 +74,15 @@ pub fn parse_bool_test() {
 pub fn parse_float_test() {
   envoy.set(key, "1.0")
   glenv.parse([#(key, glenv.Float)])
-  |> should.equal(Ok([#(key, glenv.RFloat(1.0))]))
+  |> should.equal(Ok([#(key, dynamic.from(1.0))]))
 
   envoy.set(key, "1.0001")
   glenv.parse([#(key, glenv.Float)])
-  |> should.equal(Ok([#(key, glenv.RFloat(1.0001))]))
+  |> should.equal(Ok([#(key, dynamic.from(1.0001))]))
 
   envoy.set(key, "1.000")
   glenv.parse([#(key, glenv.Float)])
-  |> should.equal(Ok([#(key, glenv.RFloat(1.0))]))
+  |> should.equal(Ok([#(key, dynamic.from(1.0))]))
 
   envoy.set(key, "1")
   glenv.parse([#(key, glenv.Float)])
@@ -97,11 +98,11 @@ pub fn parse_float_test() {
 pub fn parse_int_test() {
   envoy.set(key, "1")
   glenv.parse([#(key, glenv.Int)])
-  |> should.equal(Ok([#(key, glenv.RInt(1))]))
+  |> should.equal(Ok([#(key, dynamic.from(1))]))
 
   envoy.set(key, "2000000")
   glenv.parse([#(key, glenv.Int)])
-  |> should.equal(Ok([#(key, glenv.RInt(2_000_000))]))
+  |> should.equal(Ok([#(key, dynamic.from(2_000_000))]))
 
   envoy.set(key, "1.0")
   glenv.parse([#(key, glenv.Int)])
@@ -121,23 +122,23 @@ pub fn parse_int_test() {
 pub fn parse_string_test() {
   envoy.set(key, "1")
   glenv.parse([#(key, glenv.String)])
-  |> should.equal(Ok([#(key, glenv.RString("1"))]))
+  |> should.equal(Ok([#(key, dynamic.from("1"))]))
 
   envoy.set(key, "2000000")
   glenv.parse([#(key, glenv.String)])
-  |> should.equal(Ok([#(key, glenv.RString("2000000"))]))
+  |> should.equal(Ok([#(key, dynamic.from("2000000"))]))
 
   envoy.set(key, "1.0")
   glenv.parse([#(key, glenv.String)])
-  |> should.equal(Ok([#(key, glenv.RString("1.0"))]))
+  |> should.equal(Ok([#(key, dynamic.from("1.0"))]))
 
   envoy.set(key, "abc")
   glenv.parse([#(key, glenv.String)])
-  |> should.equal(Ok([#(key, glenv.RString("abc"))]))
+  |> should.equal(Ok([#(key, dynamic.from("abc"))]))
 
   envoy.set(key, "2_000")
   glenv.parse([#(key, glenv.String)])
-  |> should.equal(Ok([#(key, glenv.RString("2_000"))]))
+  |> should.equal(Ok([#(key, dynamic.from("2_000"))]))
 
   envoy.unset(key)
 }
