@@ -1,16 +1,14 @@
 //// glenv is a library for type-sfe environment variable access.
-//// It is inspried by a Typescript pattern using zod validators
-//// to parse and validate environment variables.
+////
 
 import decode
 import envoy
 import gleam/dict
 import gleam/dynamic
-import gleam/float
-import gleam/int
-import gleam/io
 import gleam/list
+import gleam/result
 import gleam/string
+import internal/parse
 
 /// Type represents the type of an environment variable.
 /// This dictates how the environment variable is parsed.
@@ -25,11 +23,15 @@ pub type Type {
 pub type Definition =
   #(String, Type)
 
-type ResolvedType =
-  dynamic.Dynamic
+/// EnvError represents an error that can occur when loading the environment.
+pub type EnvError {
+  MissingKeyError(key: String)
+  InvalidEnvValue(key: String, expected: Type)
+  ValidationError(errors: List(dynamic.DecodeError))
+}
 
 type Resolution =
-  #(String, ResolvedType)
+  #(String, dynamic.Dynamic)
 
 /// Load parses the environment variables and returns a Result containing the environment.
 /// Takes a decoder from the gleam/decode library and a list of definitions.
@@ -47,6 +49,7 @@ type Resolution =
 ///   #("COUNT", glenv.Int),
 ///   #("IS_ON", glenv.Bool),
 /// ]
+///
 /// let decoder =
 ///   decode.into({
 ///     use hello <- decode.parameter
@@ -62,6 +65,7 @@ type Resolution =
 ///   |> decode.field("IS_ON", decode.bool)
 ///
 /// let assert Ok(env) = glenv.load(decoder, definitions)
+///
 /// env.hello // "world"
 /// env.foo // 1.0
 /// env.count // 1
@@ -70,8 +74,8 @@ type Resolution =
 pub fn load(
   decoder: decode.Decoder(env),
   definitions: List(Definition),
-) -> Result(env, Nil) {
-  let assert Ok(parsed_env) = parse(definitions)
+) -> Result(env, EnvError) {
+  use parsed_env <- result.try(parse(definitions))
 
   case
     parsed_env
@@ -81,57 +85,51 @@ pub fn load(
   {
     Ok(env) -> Ok(env)
     Error(err) -> {
-      io.debug(err)
-      Error(Nil)
+      Error(ValidationError(err))
     }
   }
 }
 
-pub fn parse(definitions: List(Definition)) -> Result(List(Resolution), Nil) {
+fn parse(definitions: List(Definition)) -> Result(List(Resolution), EnvError) {
   let env = envoy.all()
 
   list.try_map(definitions, fn(definition) {
     let normalized_definition = #(string.uppercase(definition.0), definition.1)
     case dict.get(env, normalized_definition.0) {
       Ok(value) -> do_parse(normalized_definition, value)
-      Error(_) -> Error(Nil)
+      Error(_) -> Error(MissingKeyError(normalized_definition.0))
     }
   })
 }
 
-fn do_parse(definition: Definition, value: String) -> Result(Resolution, Nil) {
-  case definition {
-    #(_, Bool) -> parse_bool(definition, value)
-    #(_, Float) -> parse_float(definition, value)
-    #(_, Int) -> parse_int(definition, value)
-    #(_, String) -> parse_string(definition, value)
-  }
-}
-
-fn parse_bool(definition: Definition, value: String) -> Result(Resolution, Nil) {
-  let resolution =
-    ["true", "yes", "1"] |> list.contains(string.lowercase(value))
-
-  Ok(#(definition.0, dynamic.from(resolution)))
-}
-
-fn parse_float(definition: Definition, value: String) -> Result(Resolution, Nil) {
-  case float.parse(value) {
-    Ok(resolution) -> Ok(#(definition.0, dynamic.from(resolution)))
-    Error(_) -> Error(Nil)
-  }
-}
-
-fn parse_int(definition: Definition, value: String) -> Result(Resolution, Nil) {
-  case int.parse(value) {
-    Ok(resolution) -> Ok(#(definition.0, dynamic.from(resolution)))
-    Error(_) -> Error(Nil)
-  }
-}
-
-fn parse_string(
+fn do_parse(
   definition: Definition,
   value: String,
-) -> Result(Resolution, Nil) {
-  Ok(#(definition.0, dynamic.from(value)))
+) -> Result(Resolution, EnvError) {
+  case definition {
+    #(key, Bool) -> {
+      case parse.bool(key, value) {
+        Ok(resolution) -> Ok(resolution)
+        Error(_) -> Error(InvalidEnvValue(key, Bool))
+      }
+    }
+    #(key, Float) -> {
+      case parse.float(key, value) {
+        Ok(resolution) -> Ok(resolution)
+        Error(_) -> Error(InvalidEnvValue(key, Float))
+      }
+    }
+    #(key, Int) -> {
+      case parse.int(key, value) {
+        Ok(resolution) -> Ok(resolution)
+        Error(_) -> Error(InvalidEnvValue(key, Int))
+      }
+    }
+    #(key, String) -> {
+      case parse.string(key, value) {
+        Ok(resolution) -> Ok(resolution)
+        Error(_) -> Error(InvalidEnvValue(key, String))
+      }
+    }
+  }
 }
