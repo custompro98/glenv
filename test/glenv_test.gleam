@@ -12,7 +12,6 @@ pub fn main() {
   gleeunit.main()
 }
 
-
 const hello_key = "HELLO"
 
 const foo_key = "FOO"
@@ -20,7 +19,6 @@ const foo_key = "FOO"
 const count_key = "COUNT"
 
 const is_on_key = "IS_ON"
-
 
 pub type TestEnv {
   TestEnv(hello: String, count: Int, foo: Float, is_on: Bool)
