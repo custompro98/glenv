@@ -11,6 +11,7 @@ Accessing environment variables doesn't give us the type of safety guarantees we
 gleam add glenv
 ```
 ```gleam
+import dot_env
 import gleam/decode
 import glenv
 
@@ -19,6 +20,9 @@ pub type MyEnv {
 }
 
 pub fn main() {
+  // Optional: Load environment variables from a file
+  dot_env.load_default()
+
   let definitions = [
     #("HELLO", glenv.String),
     #("FOO", glenv.Float),
