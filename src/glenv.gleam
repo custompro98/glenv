@@ -13,9 +13,13 @@ import gleam/string
 /// Type represents the type of an environment variable.
 /// This dictates how the environment variable is parsed.
 pub type Type {
+  /// Boolean type, represented by any casing of "true", "yes", or "1".
   Bool
+  /// Float type, represented by values like "1.0" or "1.000".
   Float
+  /// Integer type, represented by values like "1" or "100".
   Int
+  /// String type, represented by any value.
   String
 }
 
