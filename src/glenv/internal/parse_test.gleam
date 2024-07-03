@@ -1,7 +1,7 @@
 import gleam/dynamic
 import gleeunit
 import gleeunit/should
-import internal/parse
+import glenv/internal/parse
 
 pub fn main() {
   gleeunit.main()

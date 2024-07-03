@@ -7,8 +7,8 @@ import gleam/dict
 import gleam/dynamic
 import gleam/list
 import gleam/result
+import glenv/internal/parse
 import gleam/string
-import internal/parse
 
 /// Type represents the type of an environment variable.
 /// This dictates how the environment variable is parsed.

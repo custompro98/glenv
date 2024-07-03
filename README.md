@@ -49,6 +49,24 @@ pub fn main() {
 }
 ```
 
+## Expected values
+
+### Bool
+
+Any casing of `true`, `yes` or `1` will be parsed as `True`. Any other value will be parsed as `False`.
+
+### Float
+
+Any value that can be parsed as a float will be parsed as a float. Any other value will result in an `InvalidEnvValue` error.
+
+### Int
+
+Any value that can be parsed as an int will be parsed as an int. Any other value will result in an `InvalidEnvValue` error.
+
+### String
+
+Any value will be parsed as a string.
+
 Further documentation can be found at <https://hexdocs.pm/glenv>.
 
 ## Development
