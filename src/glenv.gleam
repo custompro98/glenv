@@ -7,8 +7,8 @@ import gleam/dict
 import gleam/dynamic
 import gleam/list
 import gleam/result
-import glenv/internal/parse
 import gleam/string
+import glenv/internal/parse
 
 /// Type represents the type of an environment variable.
 /// This dictates how the environment variable is parsed.
@@ -29,9 +29,12 @@ pub type Definition =
 
 /// EnvError represents an error that can occur when loading the environment.
 pub type EnvError {
+  /// The key was not found in the environment.
   MissingKeyError(key: String)
-  InvalidEnvValue(key: String, expected: Type)
-  ValidationError(errors: List(dynamic.DecodeError))
+  /// The key was found in the environment but the value was not of the expected type.
+  InvalidEnvValueError(key: String, expected: Type)
+  /// The key was found in the environment of the correct type, but the provided definition did not match.
+  DefinitionMismatchError(errors: List(dynamic.DecodeError))
 }
 
 type Resolution =
@@ -89,7 +92,7 @@ pub fn load(
   {
     Ok(env) -> Ok(env)
     Error(err) -> {
-      Error(ValidationError(err))
+      Error(DefinitionMismatchError(err))
     }
   }
 }
@@ -114,25 +117,25 @@ fn do_parse(
     #(key, Bool) -> {
       case parse.bool(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValue(key, Bool))
+        Error(_) -> Error(InvalidEnvValueError(key, Bool))
       }
     }
     #(key, Float) -> {
       case parse.float(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValue(key, Float))
+        Error(_) -> Error(InvalidEnvValueError(key, Float))
       }
     }
     #(key, Int) -> {
       case parse.int(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValue(key, Int))
+        Error(_) -> Error(InvalidEnvValueError(key, Int))
       }
     }
     #(key, String) -> {
       case parse.string(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValue(key, String))
+        Error(_) -> Error(InvalidEnvValueError(key, String))
       }
     }
   }
