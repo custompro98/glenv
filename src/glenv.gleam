@@ -30,9 +30,9 @@ pub type Definition =
 /// EnvError represents an error that can occur when loading the environment.
 pub type EnvError {
   /// The key was not found in the environment.
-  MissingKeyError(key: String)
+  NotFoundError(key: String)
   /// The key was found in the environment but the value was not of the expected type.
-  InvalidEnvValueError(key: String, expected: Type)
+  ParseError(key: String, expected: Type)
   /// The key was found in the environment of the correct type, but the provided definition did not match.
   DefinitionMismatchError(errors: List(dynamic.DecodeError))
 }
@@ -104,7 +104,7 @@ fn parse(definitions: List(Definition)) -> Result(List(Resolution), EnvError) {
     let normalized_definition = #(string.uppercase(definition.0), definition.1)
     case dict.get(env, normalized_definition.0) {
       Ok(value) -> do_parse(normalized_definition, value)
-      Error(_) -> Error(MissingKeyError(normalized_definition.0))
+      Error(_) -> Error(NotFoundError(normalized_definition.0))
     }
   })
 }
@@ -117,25 +117,25 @@ fn do_parse(
     #(key, Bool) -> {
       case parse.bool(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValueError(key, Bool))
+        Error(_) -> Error(ParseError(key, Bool))
       }
     }
     #(key, Float) -> {
       case parse.float(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValueError(key, Float))
+        Error(_) -> Error(ParseError(key, Float))
       }
     }
     #(key, Int) -> {
       case parse.int(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValueError(key, Int))
+        Error(_) -> Error(ParseError(key, Int))
       }
     }
     #(key, String) -> {
       case parse.string(key, value) {
         Ok(resolution) -> Ok(resolution)
-        Error(_) -> Error(InvalidEnvValueError(key, String))
+        Error(_) -> Error(ParseError(key, String))
       }
     }
   }
