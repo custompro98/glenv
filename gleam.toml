@@ -1,5 +1,5 @@
 name = "glenv"
-version = "0.4.0"
+version = "0.5.0"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "custompro98", repo = "glenv" }
 description = "A library for type-safe environment variable access."
