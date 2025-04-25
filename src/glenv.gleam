@@ -1,10 +1,10 @@
 //// glenv is a library for type-sfe environment variable access.
 ////
 
-import decode
 import envoy
 import gleam/dict
 import gleam/dynamic
+import gleam/dynamic/decode
 import gleam/list
 import gleam/result
 import gleam/string
@@ -34,7 +34,7 @@ pub type EnvError {
   /// The key was found in the environment but the value was not of the expected type.
   InvalidEnvValueError(key: String, expected: Type)
   /// The key was found in the environment of the correct type, but the provided definition did not match.
-  DefinitionMismatchError(errors: List(dynamic.DecodeError))
+  DefinitionMismatchError(errors: List(decode.DecodeError))
 }
 
 type Resolution =
@@ -88,7 +88,7 @@ pub fn load(
     parsed_env
     |> dict.from_list
     |> dynamic.from
-    |> decode.from(decoder, _)
+    |> decode.run(decoder)
   {
     Ok(env) -> Ok(env)
     Error(err) -> {
@@ -104,6 +104,7 @@ fn parse(definitions: List(Definition)) -> Result(List(Resolution), EnvError) {
     let normalized_definition = #(string.uppercase(definition.0), definition.1)
     case dict.get(env, normalized_definition.0) {
       Ok(value) -> do_parse(normalized_definition, value)
+
       Error(_) -> Error(MissingKeyError(normalized_definition.0))
     }
   })

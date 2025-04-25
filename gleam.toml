@@ -1,5 +1,5 @@
 name = "glenv"
-version = "0.3.0"
+version = "0.4.0"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "custompro98", repo = "glenv" }
 description = "A library for type-safe environment variable access."
@@ -7,7 +7,6 @@ description = "A library for type-safe environment variable access."
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
 envoy = ">= 1.0.1 and < 2.0.0"
-decode = ">= 0.2.0 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"

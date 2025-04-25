@@ -1,6 +1,6 @@
-import decode
 import envoy
 import gleam/bool
+import gleam/dynamic/decode
 import gleam/float
 import gleam/int
 import gleam/string
@@ -24,6 +24,14 @@ pub type TestEnv {
   TestEnv(hello: String, count: Int, foo: Float, is_on: Bool)
 }
 
+fn test_env_decoder() -> decode.Decoder(TestEnv) {
+  use hello <- decode.field(hello_key, decode.string)
+  use count <- decode.field(count_key, decode.int)
+  use foo <- decode.field(foo_key, decode.float)
+  use is_on <- decode.field(is_on_key, decode.bool)
+  decode.success(TestEnv(hello:, count:, foo:, is_on:))
+}
+
 pub fn load_test() {
   let hello = "world"
   let foo = 1.0
@@ -41,21 +49,8 @@ pub fn load_test() {
     #(count_key, glenv.Int),
     #(is_on_key, glenv.Bool),
   ]
-  let decoder =
-    decode.into({
-      use hello <- decode.parameter
-      use foo <- decode.parameter
-      use count <- decode.parameter
-      use is_on <- decode.parameter
 
-      TestEnv(hello: hello, foo: foo, count: count, is_on: is_on)
-    })
-    |> decode.field(hello_key, decode.string)
-    |> decode.field(foo_key, decode.float)
-    |> decode.field(count_key, decode.int)
-    |> decode.field(is_on_key, decode.bool)
-
-  let result = glenv.load(decoder, definitions)
+  let result = glenv.load(test_env_decoder(), definitions)
 
   result
   |> should.equal(
@@ -86,21 +81,8 @@ pub fn load_incorrect_casing_test() {
     #(count_key, glenv.Int),
     #(is_on_key, glenv.Bool),
   ]
-  let decoder =
-    decode.into({
-      use hello <- decode.parameter
-      use foo <- decode.parameter
-      use count <- decode.parameter
-      use is_on <- decode.parameter
 
-      TestEnv(hello: hello, foo: foo, count: count, is_on: is_on)
-    })
-    |> decode.field(hello_key, decode.string)
-    |> decode.field(foo_key, decode.float)
-    |> decode.field(count_key, decode.int)
-    |> decode.field(is_on_key, decode.bool)
-
-  let result = glenv.load(decoder, definitions)
+  let result = glenv.load(test_env_decoder(), definitions)
 
   result
   |> should.equal(
@@ -130,21 +112,8 @@ pub fn load_missing_variable_test() {
     #(count_key, glenv.Int),
     #(is_on_key, glenv.Bool),
   ]
-  let decoder =
-    decode.into({
-      use hello <- decode.parameter
-      use foo <- decode.parameter
-      use count <- decode.parameter
-      use is_on <- decode.parameter
 
-      TestEnv(hello: hello, foo: foo, count: count, is_on: is_on)
-    })
-    |> decode.field(hello_key, decode.string)
-    |> decode.field(foo_key, decode.float)
-    |> decode.field(count_key, decode.int)
-    |> decode.field(is_on_key, decode.bool)
-
-  let result = glenv.load(decoder, definitions)
+  let result = glenv.load(test_env_decoder(), definitions)
 
   result
   |> should.be_error
